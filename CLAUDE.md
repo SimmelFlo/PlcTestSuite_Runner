@@ -11,12 +11,12 @@ PlcTestSuite_Runner is a .NET Framework 4.7.2 console application that automates
 The application consists of three main components:
 
 1. **Program.Main** (Program.cs:15-51): Entry point that handles command-line arguments and error reporting
-   - Expects a single argument: the TwinCAT solution file path (relative to parent directory)
+   - Expects two arguments: solution file path (relative to parent directory) and project name
    - Implements structured error handling with COM and general exception handling
 
 2. **Automation Class** (Program.cs:53-148): Core automation logic
-   - `ActivateProject`: Opens a TwinCAT solution via DTE (Development Tools Environment) COM interface
-   - Searches for "CoreProject" within the solution
+   - `ActivateProject(string project, string projectName)`: Opens a TwinCAT solution via DTE (Development Tools Environment) COM interface
+   - Searches for the specified project name within the solution
    - Uses ITcSysManager3 to activate configuration and start TwinCAT runtime
    - Hard-coded wait times: 50 seconds for project load, 10 seconds for TwinCAT startup
 
@@ -42,7 +42,7 @@ msbuild PlcTestSuite_Runner\PlcTestSuite_Runner.csproj /p:Configuration=Release
 Run the application:
 ```
 cd PlcTestSuite_Runner\bin\Debug
-PlcTestSuite_Runner.exe <solution-file-name.sln>
+PlcTestSuite_Runner.exe <solution-file-name.sln> <project-name>
 ```
 
 The solution file path is resolved relative to the parent directory of the call directory.
@@ -52,12 +52,12 @@ The solution file path is resolved relative to the parent directory of the call 
 - **[STAThread]** attribute is required on Main for COM interop
 - The application expects TwinCAT XAE Shell 17.0 (ProgID: "TcXaeShell.DTE.17.0")
 - DTE instance is created with visible UI (`dte.SuppressUI = false`, `dte.MainWindow.Visible = true`)
-- Project must contain a project named "CoreProject" - this is hard-coded
+- Project name must be specified as a command-line argument
 - COM interop types are embedded in the assembly (EmbedInteropTypes=True)
 
 ## Common Error Scenarios
 
 - COMException: TwinCAT not installed, version mismatch, or licensing issues
 - FileNotFoundException: Invalid solution path
-- InvalidOperationException: CoreProject not found or ITcSysManager3 interface unavailable
+- InvalidOperationException: Specified project not found or ITcSysManager3 interface unavailable
 - Exit code 1 indicates any error condition

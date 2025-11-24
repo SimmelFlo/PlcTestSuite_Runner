@@ -21,17 +21,19 @@ namespace PlcTestSuite_Runner
                 Console.WriteLine($"[INFO] Call directory: {callDirectory}");
                 Console.WriteLine($"[INFO] Project directory: {projectDirectory}");
 
-                if (args.Length > 0)
+                if (args.Length >= 2)
                 {
                     Automation a = new Automation();
                     string prj = projectDirectory + @"\" + args[0];
+                    string projectName = args[1];
                     Console.WriteLine($"[INFO] Project: {prj}");
-                    a.ActivateProject(prj);
+                    Console.WriteLine($"[INFO] Target project name: {projectName}");
+                    a.ActivateProject(prj, projectName);
                     Console.WriteLine("[SUCCESS] Automation completed successfully.");
                 }
                 else
                 {
-                    Console.WriteLine("[ERROR] No solution provided.");
+                    Console.WriteLine("[ERROR] Usage: PlcTestSuite_Runner.exe <solution-file.sln> <project-name>");
                     Environment.Exit(1);
                 }
             }
@@ -67,7 +69,7 @@ namespace PlcTestSuite_Runner
             MessageFilter.Revoke();
         }
 
-        public void ActivateProject(string project)
+        public void ActivateProject(string project, string projectName)
         {
             try
             {
@@ -89,7 +91,7 @@ namespace PlcTestSuite_Runner
                     Project prj = pp as Project;
                     Console.WriteLine($"[INFO] Found project: {prj.Name}");
 
-                    if (prj.Name == "CoreProject")
+                    if (prj.Name == projectName)
                     {
                         projectFound = true;
                         envDteProject = prj;
@@ -97,7 +99,7 @@ namespace PlcTestSuite_Runner
 
                         if (sysManager != null)
                         {
-                            Console.WriteLine("[INFO] CoreProject found!");
+                            Console.WriteLine($"[INFO] {projectName} found!");
                             Console.WriteLine("[STEP] Activate Configuration...");
                             sysManager.ActivateConfiguration();
                             Console.WriteLine("[STEP] Start TwinCAT...");
@@ -108,14 +110,14 @@ namespace PlcTestSuite_Runner
                         }
                         else
                         {
-                            throw new InvalidOperationException("Failed to get ITcSysManager3 interface from CoreProject.");
+                            throw new InvalidOperationException($"Failed to get ITcSysManager3 interface from {projectName}.");
                         }
                     }
                 }
 
                 if (!projectFound)
                 {
-                    throw new InvalidOperationException("CoreProject not found in solution.");
+                    throw new InvalidOperationException($"{projectName} not found in solution.");
                 }
             }
             catch (COMException comEx)
