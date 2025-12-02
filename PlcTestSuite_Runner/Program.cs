@@ -57,7 +57,7 @@ namespace PlcTestSuite_Runner
         DTE dte = null;
         Solution solution = null;
         dynamic envDteProject = null;
-        ITcSysManager3 sysManager = null;
+        ITcSysManager17 sysManager = null;
 
         public Automation()
         {
@@ -82,8 +82,8 @@ namespace PlcTestSuite_Runner
 
                 Console.WriteLine("[STEP] Opening Project...");
                 solution.Open(project);
-                Console.WriteLine("[INFO] Waiting for project to load (50 seconds)...");
-                System.Threading.Thread.Sleep(50000);
+                Console.WriteLine("[INFO] Waiting for project to load...");
+                System.Threading.Thread.Sleep(60000);
 
                 bool projectFound = false;
                 foreach (var pp in solution.Projects)
@@ -95,17 +95,24 @@ namespace PlcTestSuite_Runner
                     {
                         projectFound = true;
                         envDteProject = prj;
-                        sysManager = envDteProject.Object as ITcSysManager3;
+                        sysManager = envDteProject.Object as ITcSysManager17;
 
                         if (sysManager != null)
                         {
+                            ITcSmTreeItem plc = sysManager.LookupTreeItem("TIPC");
+                            foreach (ITcSmTreeItem plcProject in plc)
+                            {
+                                ITcPlcProject iecProjectRoot = (ITcPlcProject)plcProject;
+                                iecProjectRoot.BootProjectAutostart = true;
+                            }
+
                             Console.WriteLine($"[INFO] {projectName} found!");
                             Console.WriteLine("[STEP] Activate Configuration...");
                             sysManager.ActivateConfiguration();
                             Console.WriteLine("[STEP] Start TwinCAT...");
                             sysManager.StartRestartTwinCAT();
-                            Console.WriteLine("[INFO] Waiting for TwinCAT to start (10 seconds)...");
-                            System.Threading.Thread.Sleep(10000);
+                            Console.WriteLine("[INFO] Waiting for TwinCAT to start...");
+                            System.Threading.Thread.Sleep(20000);
                             Console.WriteLine("[INFO] TwinCAT activation completed.");
                         }
                         else
