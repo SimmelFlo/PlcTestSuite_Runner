@@ -107,13 +107,27 @@ namespace PlcTestSuite_Runner
                             }
 
                             Console.WriteLine($"[INFO] {projectName} found!");
-                            Console.WriteLine("[STEP] Activate Configuration...");
-                            sysManager.ActivateConfiguration();
-                            Console.WriteLine("[STEP] Start TwinCAT...");
-                            sysManager.StartRestartTwinCAT();
-                            Console.WriteLine("[INFO] Waiting for TwinCAT to start...");
-                            System.Threading.Thread.Sleep(20000);
-                            Console.WriteLine("[INFO] TwinCAT activation completed.");
+                            try
+                            {
+                                Console.WriteLine("[STEP] Build TwinCAT...");
+                                sysManager.BuildTargetPlatform("TwinCAT RT (x64)");
+                                Console.WriteLine("[STEP] Activate Configuration...");
+                                sysManager.ActivateConfiguration();
+                                Console.WriteLine("[STEP] Start TwinCAT...");
+                                sysManager.StartRestartTwinCAT();
+
+                                Console.WriteLine("[INFO] Waiting for TwinCAT to start...");
+                                if (sysManager.IsTwinCATStarted())
+                                {
+                                    Console.WriteLine("[SUCCESS] TwinCAT activation completed.");
+                                }
+                                System.Threading.Thread.Sleep(20000);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"[ERROR] Build & activate failed: {ex.Message}");
+                                throw;
+                            }    
                         }
                         else
                         {
