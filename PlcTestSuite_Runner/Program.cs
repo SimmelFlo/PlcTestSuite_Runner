@@ -109,8 +109,8 @@ namespace PlcTestSuite_Runner
                             Console.WriteLine($"[INFO] {projectName} found!");
                             try
                             {
-                                Console.WriteLine("[STEP] Build TwinCAT...");
-                                sysManager.BuildTargetPlatform("TwinCAT RT (x64)");
+                                //Console.WriteLine("[STEP] Build TwinCAT...");
+                                //sysManager.BuildTargetPlatform("TwinCAT RT (x64)");
                                 Console.WriteLine("[STEP] Activate Configuration...");
                                 sysManager.ActivateConfiguration();
                                 Console.WriteLine("[STEP] Start TwinCAT...");
